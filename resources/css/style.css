@@ -1,0 +1,19 @@
+/* public/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 0;
+}
+
+.nav-link {
+    color: white !important;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+}
