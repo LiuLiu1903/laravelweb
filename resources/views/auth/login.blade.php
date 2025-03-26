@@ -83,9 +83,9 @@
         </form>
 
         <!-- Link Hỗ Trợ -->
-        {{-- <div class="text-center mt-3">
+        <div class="text-center mt-3">
             <a href="{{ route('password.request') }}">Forgot your password?</a>
-        </div> --}}
+        </div>
         <div class="text-center mt-2">
             Don't have an account? 
             <a href="{{ route('register') }}" class="fw-bold">Register here</a>

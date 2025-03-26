@@ -5,6 +5,7 @@ use App\Mail\TestMail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ForgotPasswordController;
 
 // Home route
 Route::get('/', function () {
@@ -31,3 +32,12 @@ Route::controller(LoginController::class)->group(function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::middleware('guest')->group(function () {
+    Route::controller(ForgotPasswordController::class)->group(function () {
+        Route::get('/forgot-password', 'showLinkRequestForm')->name('password.request');
+        Route::post('/forgot-password', 'sendResetLinkEmail')->name('password.email');
+        Route::get('/reset-password/{token}', 'showResetForm')->name('password.reset');
+        Route::post('/reset-password', 'reset')->name('password.update');
+    });
+});
