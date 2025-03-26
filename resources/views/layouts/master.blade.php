@@ -1,3 +1,4 @@
+<!-- resources/views/layouts/master.blade.php -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -22,6 +23,10 @@
         footer {
             flex-shrink: 0;
         }
+        .nav-link.active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -32,9 +37,17 @@
                 <h1 class="h4 mb-0">My Blog</h1>
                 <nav>
                     <ul class="nav">
-                        <li class="nav-item"><a href="/" class="nav-link text-white">Home</a></li>
-                        <li class="nav-item"><a href="/about" class="nav-link text-white">About</a></li>
-                        <li class="nav-item"><a href="/contact" class="nav-link text-white">Contact</a></li>
+                        <li class="nav-item"><a href="/" class="nav-link text-white active">Home</a></li>
+                        @if (Route::has('login'))
+                            @auth
+                                <li class="nav-item"><a href="{{ url('/dashboard') }}" class="nav-link text-white">Dashboard</a></li>
+                            @else
+                                <li class="nav-item"><a href="{{ route('login') }}" class="nav-link text-white">Log in</a></li>
+                                @if (Route::has('register'))
+                                    <li class="nav-item"><a href="{{ route('register') }}" class="nav-link text-white">Register</a></li>
+                                @endif
+                            @endauth
+                        @endif
                     </ul>
                 </nav>
             </div>
