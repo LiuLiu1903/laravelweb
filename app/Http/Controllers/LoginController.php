@@ -18,7 +18,9 @@ class LoginController extends Controller
             'password' => 'required|min:8',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
 
             // Kiểm tra trạng thái tài khoản

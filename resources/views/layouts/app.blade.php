@@ -56,7 +56,7 @@
             <h4>Dashboard</h4>
             <a href="">🏠 Trang chủ</a>
             <a href="">📝 Quản lý bài viết</a>
-            <a href="">👤 Hồ sơ</a>
+            <a href="{{ route('profile.edit') }}">👤 Hồ sơ</a>
             
             <!-- Nút Đăng xuất -->
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

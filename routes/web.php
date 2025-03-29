@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Middleware\CheckUserStatus;
+use App\Http\Controllers\ProfileController;
 
 // Home route
 Route::get('/', function () {
@@ -40,4 +42,9 @@ Route::middleware('guest')->group(function () {
         Route::get('/reset-password/{token}', 'showResetForm')->name('password.reset');
         Route::post('/reset-password', 'reset')->name('password.update');
     });
+});
+
+Route::middleware(['auth', CheckUserStatus::class])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
