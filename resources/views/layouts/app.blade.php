@@ -6,6 +6,7 @@
     <title>Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    @yield('styles')
     <style>
         body {
             background-color: #f8f9fa;
@@ -54,8 +55,8 @@
         <!-- Sidebar -->
         <div class="col-md-3 sidebar">
             <h4>Dashboard</h4>
-            <a href="">🏠 Trang chủ</a>
-            <a href="">📝 Quản lý bài viết</a>
+            <a href="{{ route('dashboard') }}">🏠 Trang chủ</a>
+            <a href="{{ route('posts.index') }}">📝 Quản lý bài viết</a>
             <a href="{{ route('profile.edit') }}">👤 Hồ sơ</a>
             
             <!-- Nút Đăng xuất -->
@@ -77,5 +78,6 @@
 <!-- Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+@yield('scripts')
 </body>
 </html>

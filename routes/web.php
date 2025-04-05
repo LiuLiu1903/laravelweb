@@ -8,6 +8,10 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Middleware\CheckUserStatus;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostsController;
+use App\Models\Post;
+use App\Http\Controllers\MediaController;
+
 
 // Home route
 Route::get('/', function () {
@@ -20,7 +24,6 @@ Route::get('/send-mail', function () {
     return 'Mail đã được gửi thành công!';
 });
 
-// Authentication routes
 Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'create')->name('register');
     Route::post('/register', 'store');
@@ -47,4 +50,12 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', CheckUserStatus::class])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+
+// Route::get('posts/{post:slug}', [PostsController::class, 'show'])->name('posts.show');
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('posts', PostsController::class)
+        ->parameters(['posts' => 'post:slug']);
+    Route::post('/posts/media', [PostsController::class, 'storeMedia'])->name('posts.storeMedia');
 });

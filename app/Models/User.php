@@ -53,4 +53,9 @@ class User extends Authenticatable implements CanResetPasswordTrait
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
