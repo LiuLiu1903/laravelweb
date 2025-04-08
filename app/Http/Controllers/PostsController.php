@@ -47,17 +47,6 @@ class PostsController extends Controller
         return view('posts.show', compact('post'));
     }
 
-    // public function checkSlug(Request $request)
-    // {
-    //     $slug = str($request->title)->slug();
-    //     if (Post::where('slug', $slug)->exists()) {
-    //         $slug = $slug . '-' . Str::random(2);
-    //         return response()->json(['slug' => $slug]);
-    //     } else {
-    //         return response()->json(['slug' => $slug]);
-    //     }
-    // }
-
     public function edit(Post $post)
     {
         $this->authorize('update', $post);
@@ -69,6 +58,7 @@ class PostsController extends Controller
         $this->authorize('update', $post);
 
         $data = $request->validated();
+        // dd($data);
 
         // Update status only if changing from draft (0) to updated (1)
         $data['status'] = $post->status == 0 ? 1 : $post->status;
@@ -82,7 +72,7 @@ class PostsController extends Controller
         }
 
         return redirect()->route('posts.index')
-            ->with('success', 'Cập nhật bài viết thành công!');
+            ->with('success', 'Cập nhật bài viết thành công');
     }
     public function destroy(Post $post)
     {
@@ -105,4 +95,12 @@ class PostsController extends Controller
             'url' => asset($url),
         ]);
     }
+
+    public function dashboard()
+    {
+        $posts = Post::where('status', 2)->latest()->paginate(10);
+
+        return view('dashboard', compact('posts'));
+    }
+
 }

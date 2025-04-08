@@ -68,14 +68,6 @@
                 @enderror
             </div>
 
-            <!-- Remember Me -->
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                <label class="form-check-label" for="remember">
-                    Remember Me
-                </label>
-            </div>
-
             <!-- Submit -->
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Sign In</button>

@@ -34,9 +34,8 @@ Route::controller(LoginController::class)->group(function () {
     Route::post('/login', 'login');
     Route::post('/logout', 'logout')->name('logout');
 });
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\PostsController::class, 'dashboard'])->name('dashboard');
+
 
 Route::middleware('guest')->group(function () {
     Route::controller(ForgotPasswordController::class)->group(function () {
@@ -51,8 +50,6 @@ Route::middleware(['auth', CheckUserStatus::class])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
-
-// Route::get('posts/{post:slug}', [PostsController::class, 'show'])->name('posts.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('posts', PostsController::class)

@@ -1,12 +1,11 @@
 <?php
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Post extends Model implements HasMedia
 {
@@ -19,11 +18,11 @@ class Post extends Model implements HasMedia
         'description',
         'content',
         'publish_date',
-        'status'
+        'status',
     ];
 
     protected $casts = [
-        'publish_date' => 'datetime'
+        'publish_date' => 'datetime',
     ];
 
     // Relationship
@@ -78,16 +77,21 @@ class Post extends Model implements HasMedia
 
     public function generateUniqueSlug($title)
     {
-        $slug = Str::slug($title);
+        $slug         = Str::slug($title);
         $originalSlug = $slug;
 
         // Thêm chuỗi random nếu slug đã tồn tại
         while (static::where('slug', $slug)
-               ->where('id', '!=', $this->id ?? null)
-               ->exists()) {
+            ->where('id', '!=', $this->id ?? null)
+            ->exists()) {
             $slug = $originalSlug . '-' . Str::lower(Str::random(3));
         }
 
         return $slug;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 }
