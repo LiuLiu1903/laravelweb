@@ -1,105 +1,92 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <!-- Hiển thị thông báo - Đặt ở đầu trang -->
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+    @if (session('success'))
+        <script>alert('{{ session('success') }}');</script>
+    @endif
 
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+    @if (session('error'))
+        <script>alert('{{ session('error') }}');</script>
+    @endif
 
-        <h2>Bài Viết của Bạn</h2>
-        <a href="{{ route('posts.create') }}" class="btn btn-primary mb-3">Thêm bài viết mới</a>
-
-        @if ($posts->count() > 0)
-            @foreach ($posts as $post)
-                <div class="card mb-3">
-                    <div class="row g-0">
-                        @if ($post->hasMedia('thumbnails'))
-                            <div class="col-md-3">
-                                <img src="{{ $post->getFirstMediaUrl('thumbnails') }}" class="img-fluid rounded-start h-100"
-                                    style="object-fit: cover; max-height: 200px;" alt="Thumbnail">
-                            </div>
-                        @else
-                            <div class="col-md-3 bg-light d-flex align-items-center justify-content-center">
-                                <span class="text-muted">Không có ảnh</span>
-                            </div>
-                        @endif
-
-                        <div class="col-md-9">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $post->title }}</h5>
-                                <p class="card-text">{{ Str::limit($post->description, 200) }}</p>
-                                <p class="card-text">
-                                    <small class="text-muted">
-                                        Trạng thái:
-                                        <span
-                                            class="badge {{ $post->status == 2 ? 'bg-success' : ($post->status == 1 ? 'bg-warning' : 'bg-primary') }}">
-                                            {{ $post->status == 2 ? 'Xuất bản' : ($post->status == 1 ? 'Được cập nhật' : 'Bài viết mới') }}
-                                        </span>
-                                        •
-                                        Ngày tạo: {{ $post->created_at->format('d/m/Y H:i') }}
-                                    </small>
-                                </p>
-
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('posts.show', $post->slug) }}" class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </a>
-                                    <a href="{{ route('posts.edit', $post->slug) }}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <form action="{{ route('posts.destroy', $post->slug) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Bạn chắc chắn muốn xóa?')">
-                                            <i class="fas fa-trash-alt"></i> Xóa
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
-            <div class="d-flex justify-content-center mt-4">
-                {{ $posts->links() }}
-            </div>
-        @else
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i> Bạn chưa có bài viết nào
-            </div>
-        @endif
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">Your Posts List</h4>
+        <a href="{{ route('posts.create') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create Post
+        </a>
     </div>
-@endsection
 
-@section('styles')
-    <!-- Thêm Font Awesome nếu chưa có -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        .card {
-            transition: transform 0.2s;
-        }
+    <form method="POST" action="{{ route('posts.deleteAll') }}">
+        @csrf
+        @method('DELETE')
+        <button type="submit" onclick="return confirm('Bạn xác nhận xoá tất cả bài viết?')" class="btn btn-link text-danger p-0 mb-3">
+            Delete All
+        </button>
+    </form>
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Ảnh</th>
+                    <th>Tiêu đề</th>
+                    <th>Mô tả</th>
+                    <th>Ngày tạo</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($posts as $post)
+                    <tr>
+                        <td style="width: 180px;">
+                            <img src="{{ $post->thumbnail }}" alt="Thumbnail" class="img-fluid rounded" style="width: 140px; height: 100px; object-fit: cover;">
+                        </td>
+                        <td>{{ Str::limit($post->title, 30) }}</td>
+                        <td>{{ Str::limit(strip_tags($post->description), 50) }}</td>
+                        <td><span class="small">{{ $post->created_at->format('d/m/Y H:i') }}</span></td>
+                        <td>
+                            @if ($post->status == 0)
+                                <span class="badge bg-success">Chờ duyệt</span>
+                            @else
+                                <span class="badge bg-primary">Đã duyệt</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                {{-- Xem --}}
+                                <a href="{{ route('posts.show', $post->slug) }}" class="btn btn-outline-primary btn-sm" title="Xem">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                        
+                                {{-- Sửa --}}
+                                <a href="{{ route('posts.edit', $post->slug) }}" class="btn btn-outline-warning btn-sm" title="Sửa">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                        
+                                {{-- Xoá --}}
+                                <form action="{{ route('posts.destroy', $post->slug) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xoá bài viết này?')" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Xoá">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
 
-        .btn-group .btn {
-            margin-right: 5px;
-        }
-    </style>
+                @if ($posts->isEmpty())
+                    <tr>
+                        <td colspan="6" class="text-center">Không có bài viết nào.</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        {{ $posts->links() }}
+    </div>
 @endsection

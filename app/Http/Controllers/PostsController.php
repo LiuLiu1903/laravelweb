@@ -1,21 +1,19 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
-    use AuthorizesRequests;
-
     public function index()
     {
-        $posts = Post::where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
-
+        $posts = Auth::user()->posts()->latest()->paginate(10);
         return view('posts.index', compact('posts'));
     }
 
@@ -26,9 +24,9 @@ class PostsController extends Controller
 
     public function store(PostRequest $request)
     {
-        $data            = $request->validated();
+        $data = $request->validated();
         $data['user_id'] = Auth::id();
-        $data['status']  = 0; // Default status
+        $data['status'] = 0; // Default status
 
         $post = Post::create($data);
 
@@ -37,8 +35,7 @@ class PostsController extends Controller
                 ->toMediaCollection('thumbnails');
         }
 
-        return redirect()->route('posts.index')
-            ->with('success', 'Tạo bài viết thành công!');
+        return redirect()->route('posts.index')->with('success', 'Tạo bài viết thành công!');
     }
 
     public function show(Post $post)
@@ -58,9 +55,6 @@ class PostsController extends Controller
         $this->authorize('update', $post);
 
         $data = $request->validated();
-        // dd($data);
-
-        // Update status only if changing from draft (0) to updated (1)
         $data['status'] = $post->status == 0 ? 1 : $post->status;
 
         $post->update($data);
@@ -71,25 +65,47 @@ class PostsController extends Controller
                 ->toMediaCollection('thumbnails');
         }
 
-        return redirect()->route('posts.index')
-            ->with('success', 'Cập nhật bài viết thành công');
+        return redirect()->route('posts.index')->with('success', 'Cập nhật bài viết thành công');
     }
+
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
         $post->delete();
-        return redirect()->route('posts.index')
-            ->with('success', 'Xóa bài viết thành công!');
+        return redirect()->route('posts.index')->with('success', 'Xóa bài viết thành công!');
+    }
+
+    public function deleteAll()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return view('error.pageerror');
+        }
+
+        $deleted = $user->posts()->delete();
+
+        if ($deleted) {
+            return redirect()->route('posts.index')->with('success', 'Xoá tất cả bài viết thành công');
+        } else {
+            return redirect()->route('posts.index')->with('error', 'Có lỗi xảy ra. Xoá thất bại');
+        }
+    }
+
+    public function data()
+    {
+        $posts = auth()->user()->posts()->select('id', 'title', 'status', 'created_at');
+        return datatables($posts)->make(true);
     }
 
     public function storeMedia(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|max:2048', // Max 2MB
+            'image' => 'required|image|max:2048',
         ]);
 
         $path = $request->file('image')->store('public/tmp');
-        $url  = Storage::url($path);
+        $url = Storage::url($path);
 
         return response()->json([
             'url' => asset($url),
@@ -99,8 +115,28 @@ class PostsController extends Controller
     public function dashboard()
     {
         $posts = Post::where('status', 2)->latest()->paginate(10);
-
         return view('dashboard', compact('posts'));
     }
 
+    public function showTrash()
+    {
+        $userID = Auth::id();
+        $trashedPost = Post::where('user_id', $userID)->onlyTrashed()->paginate(6);
+        return view('posts.deleted', compact('trashedPost'));
+    }
+
+    public function restorePost(Request $request)
+    {
+        if (!$request->slug) {
+            return view('error.pageerror');
+        }
+
+        $post = Post::withTrashed()->where('slug', $request->slug)->restore();
+
+        if ($post) {
+            return back()->with('success', 'Khôi phục bài viết thành công');
+        } else {
+            return back()->with('error', 'Có lỗi xảy ra. Khôi phục bài viết thất bại');
+        }
+    }
 }

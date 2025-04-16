@@ -55,4 +55,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('posts', PostsController::class)
         ->parameters(['posts' => 'post:slug']);
     Route::post('/posts/media', [PostsController::class, 'storeMedia'])->name('posts.storeMedia');
+    Route::delete('/user/posts/delete-all', [PostsController::class, 'deleteAll'])->name('posts.deleteAll');
+    Route::get('/posts/{post:slug}/media', [PostsController::class, 'showMedia'])->name('posts.showMedia');
+    Route::get('/posts/profile/trash',[PostsController::class,'showTrash'])->name('training.posts.profile.trash');
+    Route::post('/posts/profile/restore',[PostsController::class,'restorePost'])->name('training.posts.restore');
 });

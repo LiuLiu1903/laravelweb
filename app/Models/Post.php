@@ -3,18 +3,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Post extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'user_id',
         'title',
-        'slug',
         'description',
         'content',
         'publish_date',
@@ -65,7 +65,9 @@ class Post extends Model implements HasMedia
         parent::boot();
 
         static::creating(function ($post) {
-            $post->slug = $post->generateUniqueSlug($post->title);
+            if (empty($post->slug)) {
+                $post->slug = $post->generateUniqueSlug($post->title);
+            }
         });
 
         static::updating(function ($post) {
@@ -77,21 +79,18 @@ class Post extends Model implements HasMedia
 
     public function generateUniqueSlug($title)
     {
-        $slug         = Str::slug($title);
+        $slug = Str::slug($title);
         $originalSlug = $slug;
-
-        // Thêm chuỗi random nếu slug đã tồn tại
-        while (static::where('slug', $slug)
-            ->where('id', '!=', $this->id ?? null)
-            ->exists()) {
+    
+        while (static::where('slug', $slug)->withTrashed()->exists()) {
             $slug = $originalSlug . '-' . Str::lower(Str::random(3));
         }
-
+    
         return $slug;
     }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
+    
+    // public function getRouteKeyName(): string
+    // {
+    //     return 'slug';
+    // }
 }
