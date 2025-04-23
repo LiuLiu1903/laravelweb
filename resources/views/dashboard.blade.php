@@ -5,26 +5,31 @@
     <h1>Dashboard</h1>
     <div class="row mt-4">
         @forelse ($posts as $post)
-            <div class="col-md-4 mb-4">
+            <div class="col-12 mb-4">
                 <div class="card h-100">
-                    {{-- Hiển thị ảnh bài viết --}}
-                    @if($post->image)
-                        <img src="{{ asset('storage/' . $post->image) }}" class="card-img-top" alt="Ảnh bài viết" style="height: 200px; object-fit: cover;">
-                    @else
-                        <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="No image">
-                    @endif
+                    {{-- Ảnh bài viết --}}
+                    <div class="text-center" style="height: 250px; overflow: hidden;">
+                        @if ($post->getFirstMediaUrl('thumbnails'))
+                            <img src="{{ $post->getFirstMediaUrl('thumbnails') }}" 
+                                 alt="{{ $post->title }}" 
+                                 class="img-fluid h-100 w-auto rounded" 
+                                 style="object-fit: cover;">
+                        @else
+                            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                                Không có ảnh
+                            </div>
+                        @endif
+                    </div>
 
-                    <div class="card-body">
-                        {{-- Mô tả --}}
+                    {{-- Nội dung --}}
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <p class="card-text">{{ Str::limit($post->description, 100) }}</p>
-
-                        {{-- Ngày tạo --}}
                         <p class="text-muted mb-2">
                             <small>Ngày tạo: {{ $post->created_at->format('d/m/Y') }}</small>
                         </p>
-
-                        {{-- Link tới bài viết --}}
-                        <a href="{{ route('posts.show', $post->slug) }}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        <a href="{{ route('posts.show', $post->slug) }}" class="btn btn-outline-primary btn-sm mt-auto">
+                            Xem chi tiết
+                        </a>
                     </div>
                 </div>
             </div>
@@ -37,7 +42,6 @@
         @endforelse
     </div>
 
-    {{-- Phân trang --}}
     <div class="d-flex justify-content-center">
         {{ $posts->links() }}
     </div>

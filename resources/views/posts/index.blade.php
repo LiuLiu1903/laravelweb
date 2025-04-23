@@ -49,7 +49,7 @@
                             @if ($post->status == 0)
                                 <span class="badge bg-success">Chờ duyệt</span>
                             @else
-                                <span class="badge bg-primary">Đã duyệt</span>
+                                <span class="badge bg-primary">Đã sửa</span>
                             @endif
                         </td>
                         <td class="text-center">

@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'user' => [ // <-- thêm guard này nếu dùng auth('user')
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
     ],
 
     /*

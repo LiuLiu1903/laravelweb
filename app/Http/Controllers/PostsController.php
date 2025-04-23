@@ -8,9 +8,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PostsController extends Controller
 {
+    use AuthorizesRequests;
+    
     public function index()
     {
         $posts = Auth::user()->posts()->latest()->paginate(10);
@@ -40,7 +43,6 @@ class PostsController extends Controller
 
     public function show(Post $post)
     {
-        $this->authorize('view', $post);
         return view('posts.show', compact('post'));
     }
 

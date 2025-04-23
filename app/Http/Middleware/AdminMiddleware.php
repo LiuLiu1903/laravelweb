@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
@@ -15,6 +15,19 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+
+        // dd([
+        //     'default_check' => auth()->check(),
+        //     'default_user'  => auth()->user(),
+        //     'user_guard'    => auth('user')->check(),
+        //     'user_object'   => auth('user')->user(),
+        // ]);
+
+
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            abort(404);
+        }
+    
         return $next($request);
+     }
     }
-}

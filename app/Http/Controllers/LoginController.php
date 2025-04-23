@@ -9,6 +9,11 @@ class LoginController extends Controller
 {
     public function showLogin()
     {
+        if (Auth::check()) {
+
+            return redirect()->route('dashboard');
+        }
+
         return view('auth.login');
     }
     public function login(Request $request)
@@ -17,6 +22,8 @@ class LoginController extends Controller
             'email' => 'required|email|max:100',
             'password' => 'required|min:8',
         ]);
+
+        
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();

@@ -28,6 +28,6 @@ class RegisterController extends Controller
             
             Mail::to($user->email)->send(new WelcomeMail($user));
 
-            return back()->with('success','Đăng ký tài khoản thành công');
+            return redirect()->route('login')->with('success', 'Đăng ký tài khoản thành công');
     }
 }
